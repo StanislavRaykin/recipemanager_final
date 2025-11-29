@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-console.log(process.env.APIK);
 const firebaseConfig = {
   apiKey: process.env.APIK.toString(),
   authDomain: "recipeemanager.firebaseapp.com",

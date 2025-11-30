@@ -1,3 +1,4 @@
+import { ref } from "process";
 import {db, storage} from "./dbinit.js";
 import * as fbs from "firebase/firestore";
 
@@ -33,10 +34,26 @@ export async function add(title, ingredients, imageBytes, userId) {
 
 export async function update(id, title, ingredients, imageBytes) {
     const recipeRef = fbs.doc(db, "recipes", id);
+    const updatedData = {};
+    updatedData.title = title;
+    updatedData.ingredients = ingredients;
+
+    if(imageBytes){
+        const imageRef = ref(storage, `images/${title}-${Date.now()}.jpg`);
+        await uploadBytes(imageRef, imageBytes);
+        const imageUrl = await getDownloadURL(imageRef);
+        updatedData.imageUrl = imageUrl;
+    }
+
+    await fbs.updateDoc(recipeRef, updatedData);
     
 }
 
 export async function remove(id) {
-    await fbs.deleteDoc(fbs.doc(db, "recipes", id));
+    const recipeRef = fbs.doc(db, "recipes", id);
+    const imageRef = ref(storage, docRef.data().imageUrl);
+
+    await deleteObject(imageRef);
+    await fbs.deleteDoc(recipeRef);
 }
 
